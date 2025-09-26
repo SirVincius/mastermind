@@ -3,7 +3,7 @@ public static class StringDigits
     public static readonly string[][] DigitLayers ={
         [
             "#####  ",  // 0
-            "    #  ",  // 1
+            "###    ",  // 1
             "#####  ",  // 2
             "#####  ",  // 3
             "#   #  ",  // 4
@@ -15,7 +15,7 @@ public static class StringDigits
         ],
         [
             "#   #  ",  // 0
-            "    #  ",  // 1
+            "  #    ",  // 1
             "    #  ",  // 2
             "    #  ",  // 3
             "#   #  ",  // 4
@@ -28,7 +28,7 @@ public static class StringDigits
 
         [
             "#   #  ",  // 0
-            "    #  ",  // 1
+            "  #    ",  // 1
             "#####  ",  // 2
             "#####  ",  // 3
             "#####  ",  // 4
@@ -41,7 +41,7 @@ public static class StringDigits
 
         [
             "#   #  ",  // 0
-            "    #  ",  // 1
+            "  #    ",  // 1
             "#      ",  // 2
             "    #  ",  // 3
             "    #  ",  // 4
@@ -54,7 +54,7 @@ public static class StringDigits
 
         [
             "#####  ",  // 0
-            "    #  ",  // 1
+            "#####  ",  // 1
             "#####  ",  // 2
             "#####  ",  // 3
             "    #  ",  // 4
