@@ -1,9 +1,21 @@
-﻿using System.Dynamic;
+﻿using System.ComponentModel;
+using System.Dynamic;
+using System.Globalization;
+using System.Reflection.Metadata;
 public class Attempt
 {
-    int[] Digits;
+    public int[] Digits;
     public int DigitMatches;
     public int PerfectMatches;
+
+    public Attempt(string sequence, int numberOfDigits)
+    {
+        Digits = new int[numberOfDigits];
+        for (int i = 0; i < sequence.Length; i++)
+        {
+            Digits[i] = (int)char.GetNumericValue(sequence[i]);
+        }
+    }
 }
 public class Game
 {
@@ -16,6 +28,18 @@ public class Game
     {
         HighestDigit = highestDigit;
         NumberOfDigits = numberOfDigits;
+        Solution = GenerateSolution();
+    }
+
+    public int[] GenerateSolution()
+    {
+        int[] solution = new int[5];
+        Random random = new Random();
+        for (int i = 0; i < NumberOfDigits; i++)
+        {
+            solution[i] = random.Next(0, HighestDigit + 1);
+        }
+        return solution;
     }
 
     public void PrintMenu()
@@ -23,21 +47,167 @@ public class Game
         Console.WriteLine(Message.Menu);
     }
 
+    public void ChooseMenuOption()
+    {
+        while (true)
+        {
+            Console.Write("Choose an option : ");
+            string choice = Console.ReadLine();
+            if (int.TryParse(choice, out int number))
+            {
+                if (number == 1)
+                {
+                    HighestDigit = ChooseHighestDigits();
+                    NumberOfDigits = ChooseNumberOfDigits();
+                    StartGame();
+                }
+                else if (number == 2)
+                {
+                    PrintBig(GenerateSolution());
+                }
+                else if (number == 3)
+                {
+                    Console.WriteLine("Goodbye");
+                    return;
+                }
+                else
+                {
+                    Console.Write("Invalid choice.\n");
+                }
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.Write("Invalid choice.\n\n");
+            }
+        }
+    }
+
+    public int ChooseHighestDigits()
+    {
+        while (true)
+        {
+            Console.Write("Choose the highest digit that can appear in the solution (1-9): ");
+            string highestDigit = Console.ReadLine();
+            if (int.TryParse(highestDigit, out int choice))
+            {
+                if (choice >= 1 && choice <= 9)
+                {
+                    return choice;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice.");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+                Console.WriteLine();
+            }
+        }
+    }
+
+     public int ChooseNumberOfDigits()
+    {
+        while (true)
+        {
+            Console.Write("Choose how many digits the solution should contain (2-9): ");
+            string numberOfDigits = Console.ReadLine();
+            if (int.TryParse(numberOfDigits, out int choice))
+            {
+                if (choice >= 2 && choice <= 9)
+                {
+                    return choice;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice.");
+                    Console.WriteLine();
+                }
+            }
+            else
+            { 
+                Console.WriteLine("Invalid choice.");
+                Console.WriteLine();
+            }
+        }
+    }
+    public int GetNumberOfPerfectMatches(Attempt attempt)
+    {
+        int numberOfPerfectMatches = 0;
+        for (int i = 0; i < attempt.Digits.Length; i++)
+        {
+            if (attempt.Digits[i] == Solution[i])
+                numberOfPerfectMatches++;
+        }
+        return numberOfPerfectMatches;
+    }
+
+    public int GetNumberOfCorrectDigits(Attempt attempt)
+    {
+        int[] attemptDigits = new int[NumberOfDigits];
+        int[] solutionDigits = new int[NumberOfDigits];
+        for (int i = 0; i < Solution.Length; i++)
+        {
+            attemptDigits[attempt.Digits[i]]++;
+            solutionDigits[solutionDigits[i]]++;
+        }
+        int numberOfCorrectDigits = 0;
+        for (int i = 0; i < Solution.Length; i++)
+        {
+            numberOfCorrectDigits += Math.Abs(attemptDigits[i] - solutionDigits[i]);
+        }
+        return 1; //TO CHANGE
+    }
+    public void StartGame()
+    {
+        while (true)
+        {
+            Console.WriteLine($"Enter {NumberOfDigits} digits between 0-{HighestDigit} : ");
+            string sequence = Console.ReadLine();
+            if (int.TryParse(sequence, out int choice))
+            {
+                bool isValid = true;
+                if (sequence.Length != NumberOfDigits)
+                    isValid = false;
+                foreach (char c in sequence)
+                {
+                    int digitValue = (int)char.GetNumericValue(c);
+                    if (digitValue < 0 || digitValue > HighestDigit)
+                        isValid = false;
+                }
+                if (isValid)
+                {
+                    Console.WriteLine("Valid");
+                    Attempt attempt = new Attempt(sequence, NumberOfDigits);
+                }
+                else
+                    Console.WriteLine("Invalid");
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+            }
+        }
+    }
     public void PrintBig(int[] arr)
     {
         for (int i = 0; i < 5; i++)
         {
             for (int digit = 0; digit < arr.Length - 2; digit++)
             {
-                Console.Write(StringDigits.DigitLayers[i][digit]);
+                Console.Write(StringDigits.DigitLayers[i][arr[digit]]);
             }
             Console.Write("   ||     ");
             for (int digit = arr.Length - 2; digit < arr.Length; digit++)
             {
-                Console.Write(StringDigits.DigitLayers[i][digit]);
+                Console.Write(StringDigits.DigitLayers[i][arr[digit]]);
             }
             Console.WriteLine();
         }
+        Console.WriteLine("");
     }
 }
 
@@ -46,9 +216,9 @@ class Program
     public static void Main(string[] args)
     {
         Console.Clear();
-        Game game = new Game();
+        Game game = new Game(4, 5);
         game.PrintMenu();
-        game.PrintBig([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        game.ChooseMenuOption();
     }
 }
 /*
