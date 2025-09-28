@@ -52,44 +52,44 @@ public class Game
         return solution;
     }
 
-    public void PrintMenu()
-    {
-        Console.WriteLine(Message.Menu);
-    }
-
     public void ChooseMenuOption()
     {
         while (true)
         {
-            Console.Write("Choose an option : ");
-            string choice = Console.ReadLine();
-            if (int.TryParse(choice, out int number))
+            Console.WriteLine(Message.Menu);
+            while (true)
             {
-                if (number == 1)
+                Console.Write("Choose an option : ");
+                string choice = Console.ReadLine();
+                if (int.TryParse(choice, out int number))
                 {
-                    HighestDigit = ChooseHighestDigits();
-                    NumberOfDigits = ChooseNumberOfDigits();
-                    Solution = GenerateSolution();
-                    StartGame();
-                }
-                else if (number == 2)
-                {
-                    Console.WriteLine("Implementation to come");
-                }
-                else if (number == 3)
-                {
-                    Console.WriteLine("Goodbye");
-                    return;
+                    if (number == 1)
+                    {
+                        HighestDigit = ChooseHighestDigits();
+                        NumberOfDigits = ChooseNumberOfDigits();
+                        Solution = GenerateSolution();
+                        StartGame();
+                        break;
+                    }
+                    else if (number == 2)
+                    {
+                        Console.WriteLine("Implementation to come");
+                    }
+                    else if (number == 3)
+                    {
+                        Console.WriteLine("Goodbye");
+                        return;
+                    }
+                    else
+                    {
+                        Console.Write("Invalid choice.\n");
+                    }
+                    Console.WriteLine();
                 }
                 else
                 {
-                    Console.Write("Invalid choice.\n");
+                    Console.Write("Invalid choice.\n\n");
                 }
-                Console.WriteLine();
-            }
-            else
-            {
-                Console.Write("Invalid choice.\n\n");
             }
         }
     }
@@ -199,7 +199,10 @@ public class Game
                     attempt.PrintAttempt();
                     if (attempt.PerfectMatches == NumberOfDigits)
                     {
-                        Console.WriteLine("Congratulation");
+                        Console.WriteLine("CONGRATULATIONS!\n");
+                        Console.WriteLine("Press enter to continue...");
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
                     }
                     
@@ -221,7 +224,6 @@ class Program
     {
         Console.Clear();
         Game game = new Game();
-        game.PrintMenu();
         game.ChooseMenuOption();
     }
 }
