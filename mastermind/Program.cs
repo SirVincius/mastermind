@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Globalization;
 using System.Reflection.Metadata;
+
 public class Attempt
 {
     public int[] Digits;
@@ -16,25 +17,34 @@ public class Attempt
             Digits[i] = (int)char.GetNumericValue(sequence[i]);
         }
     }
+
+    public void PrintAttempt()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            for (int digit = 0; digit < Digits.Length; digit++)
+            {
+                Console.Write(StringDigits.DigitLayers[i][Digits[digit]]);
+            }
+            Console.Write("   ||     ");
+            Console.Write(StringDigits.DigitLayers[i][DigitMatches]);
+            Console.Write(StringDigits.DigitLayers[i][PerfectMatches]);
+            Console.WriteLine();
+        }
+        Console.WriteLine("");
+    }
 }
 public class Game
 {
+    private Random random = new Random();
     public int HighestDigit { get; set; }
     public int NumberOfDigits;
     public int[] Solution { get; set; } = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public Attempt[] Attempts { get; set; }
 
-    public Game(int highestDigit, int numberOfDigits)
-    {
-        HighestDigit = highestDigit;
-        NumberOfDigits = numberOfDigits;
-        Solution = GenerateSolution();
-    }
-
     public int[] GenerateSolution()
     {
         int[] solution = new int[NumberOfDigits];
-        Random random = new Random();
         for (int i = 0; i < NumberOfDigits; i++)
         {
             solution[i] = random.Next(0, HighestDigit + 1);
@@ -59,11 +69,12 @@ public class Game
                 {
                     HighestDigit = ChooseHighestDigits();
                     NumberOfDigits = ChooseNumberOfDigits();
+                    Solution = GenerateSolution();
                     StartGame();
                 }
                 else if (number == 2)
                 {
-                    PrintBig(GenerateSolution());
+                    Console.WriteLine("Implementation to come");
                 }
                 else if (number == 3)
                 {
@@ -145,29 +156,29 @@ public class Game
         return numberOfPerfectMatches;
     }
 
-public int GetNumberOfCorrectDigits(Attempt attempt)
-{
-    int[] attemptDigits = new int[HighestDigit + 1];
-    int[] solutionDigits = new int[HighestDigit + 1];
-    for (int i = 0; i < Solution.Length; i++)
+    public int GetNumberOfCorrectDigits(Attempt attempt)
     {
-        attemptDigits[attempt.Digits[i]]++;
-        solutionDigits[Solution[i]]++;
-    }
-    int numberOfCorrectDigits = 0;
-    for (int d = 0; d <= HighestDigit; d++)
-    {
-        numberOfCorrectDigits += Math.Min(attemptDigits[d], solutionDigits[d]);
-    }
+        int[] attemptDigits = new int[HighestDigit + 1];
+        int[] solutionDigits = new int[HighestDigit + 1];
+        for (int i = 0; i < Solution.Length; i++)
+        {
+            attemptDigits[attempt.Digits[i]]++;
+            solutionDigits[Solution[i]]++;
+        }
+        int numberOfCorrectDigits = 0;
+        for (int d = 0; d <= HighestDigit; d++)
+        {
+            numberOfCorrectDigits += Math.Min(attemptDigits[d], solutionDigits[d]);
+        }
 
-    return numberOfCorrectDigits;
-}
+        return numberOfCorrectDigits;
+    }
 
     public void StartGame()
     {
         while (true)
         {
-            Console.WriteLine($"Enter {NumberOfDigits} digits between 0-{HighestDigit} : ");
+            Console.Write($"Enter {NumberOfDigits} digits between 0-{HighestDigit} : ");
             string sequence = Console.ReadLine();
             if (int.TryParse(sequence, out int choice))
             {
@@ -182,8 +193,16 @@ public int GetNumberOfCorrectDigits(Attempt attempt)
                 }
                 if (isValid)
                 {
-                    Console.WriteLine("Valid");
                     Attempt attempt = new Attempt(sequence, NumberOfDigits);
+                    attempt.DigitMatches = GetNumberOfCorrectDigits(attempt);
+                    attempt.PerfectMatches = GetNumberOfPerfectMatches(attempt);
+                    attempt.PrintAttempt();
+                    if (attempt.PerfectMatches == NumberOfDigits)
+                    {
+                        Console.WriteLine("Congratulation");
+                        break;
+                    }
+                    
                 }
                 else
                     Console.WriteLine("Invalid");
@@ -194,23 +213,6 @@ public int GetNumberOfCorrectDigits(Attempt attempt)
             }
         }
     }
-    public void PrintBig(int[] arr)
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            for (int digit = 0; digit < arr.Length - 2; digit++)
-            {
-                Console.Write(StringDigits.DigitLayers[i][arr[digit]]);
-            }
-            Console.Write("   ||     ");
-            for (int digit = arr.Length - 2; digit < arr.Length; digit++)
-            {
-                Console.Write(StringDigits.DigitLayers[i][arr[digit]]);
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("");
-    }
 }
 
 class Program
@@ -218,7 +220,7 @@ class Program
     public static void Main(string[] args)
     {
         Console.Clear();
-        Game game = new Game(4, 5);
+        Game game = new Game();
         game.PrintMenu();
         game.ChooseMenuOption();
     }
