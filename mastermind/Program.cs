@@ -40,7 +40,7 @@ public class Game
     public int HighestDigit { get; set; }
     public int NumberOfDigits;
     public int[] Solution { get; set; } = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    public Attempt[] Attempts { get; set; }
+    public List<Attempt> Attempts { get; set; } = new List<Attempt>();
 
     public int[] GenerateSolution()
     {
@@ -196,7 +196,12 @@ public class Game
                     Attempt attempt = new Attempt(sequence, NumberOfDigits);
                     attempt.DigitMatches = GetNumberOfCorrectDigits(attempt);
                     attempt.PerfectMatches = GetNumberOfPerfectMatches(attempt);
-                    attempt.PrintAttempt();
+                    Attempts.Add(attempt);
+                    Console.Clear();
+                    for (int i = 0; i < Attempts.Count; i++)
+                    {
+                        Attempts[i].PrintAttempt();
+                    }
                     if (attempt.PerfectMatches == NumberOfDigits)
                     {
                         Console.WriteLine("CONGRATULATIONS!\n");
