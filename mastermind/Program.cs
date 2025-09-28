@@ -19,8 +19,8 @@ public class Attempt
 }
 public class Game
 {
-    public int HighestDigit { get; set; } = 4;
-    public int NumberOfDigits = 5;
+    public int HighestDigit { get; set; }
+    public int NumberOfDigits;
     public int[] Solution { get; set; } = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public Attempt[] Attempts { get; set; }
 
@@ -33,7 +33,7 @@ public class Game
 
     public int[] GenerateSolution()
     {
-        int[] solution = new int[5];
+        int[] solution = new int[NumberOfDigits];
         Random random = new Random();
         for (int i = 0; i < NumberOfDigits; i++)
         {
@@ -145,22 +145,24 @@ public class Game
         return numberOfPerfectMatches;
     }
 
-    public int GetNumberOfCorrectDigits(Attempt attempt)
+public int GetNumberOfCorrectDigits(Attempt attempt)
+{
+    int[] attemptDigits = new int[HighestDigit + 1];
+    int[] solutionDigits = new int[HighestDigit + 1];
+    for (int i = 0; i < Solution.Length; i++)
     {
-        int[] attemptDigits = new int[NumberOfDigits];
-        int[] solutionDigits = new int[NumberOfDigits];
-        for (int i = 0; i < Solution.Length; i++)
-        {
-            attemptDigits[attempt.Digits[i]]++;
-            solutionDigits[solutionDigits[i]]++;
-        }
-        int numberOfCorrectDigits = 0;
-        for (int i = 0; i < Solution.Length; i++)
-        {
-            numberOfCorrectDigits += Math.Abs(attemptDigits[i] - solutionDigits[i]);
-        }
-        return 1; //TO CHANGE
+        attemptDigits[attempt.Digits[i]]++;
+        solutionDigits[Solution[i]]++;
     }
+    int numberOfCorrectDigits = 0;
+    for (int d = 0; d <= HighestDigit; d++)
+    {
+        numberOfCorrectDigits += Math.Min(attemptDigits[d], solutionDigits[d]);
+    }
+
+    return numberOfCorrectDigits;
+}
+
     public void StartGame()
     {
         while (true)
