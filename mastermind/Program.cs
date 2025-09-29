@@ -2,6 +2,17 @@
 using System.Dynamic;
 using System.Globalization;
 using System.Reflection.Metadata;
+public enum Position
+{
+    First = 0,
+    Second = 1,
+    Third = 2,
+    Fourth = 3,
+    Fifth = 4,
+    Sixth = 5,
+    Seventh = 6,
+    Eighth = 7,
+}
 
 public class Attempt
 {
@@ -41,6 +52,13 @@ public class Game
     public int NumberOfDigits;
     public int[] Solution { get; set; } = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public List<Attempt> Attempts { get; set; } = new List<Attempt>();
+    public List<string> Hints { get; set; } = new List<string>();
+    public Game(){} // For testing purpose only
+    public Game(int highestDigit, int numberOfDigits)
+    {
+        HighestDigit = highestDigit;
+        NumberOfDigits = numberOfDigits;
+    }
 
     public int[] GenerateSolution()
     {
@@ -50,6 +68,84 @@ public class Game
             solution[i] = random.Next(0, HighestDigit + 1);
         }
         return solution;
+    }
+
+    public void GenerateHint()
+    {
+            string hint;
+        while (true)
+        {
+            int randomHintType = random.Next(1, 4);
+            if (randomHintType == 1)
+            {
+                hint = GetHintGivenDigitCount(GetRandomDigitInGame());
+            }
+            else if (randomHintType == 2)
+            {
+                hint = GetFreePerfectMatch(GetRandomDSolutionIndex());
+            }
+            else
+            {
+                hint = GetHintRelativeIndexes(Get2DifferentSolutionIndexes());
+            }
+            if (!Hints.Contains(hint))
+            break;
+        }
+        Hints.Add(hint);
+    }
+
+    public int GetRandomDigitInGame()
+    {
+        int randomDigit = random.Next(0, HighestDigit + 1);
+        return randomDigit;
+    }
+
+    public int GetRandomDSolutionIndex()
+    {
+        int randomIndex = random.Next(0, Solution.Length - 1);
+        return randomIndex;
+    }
+
+    public int[] Get2DifferentSolutionIndexes()
+    {
+        List<int> solutionIndexes = new List<int>();
+        for (int i = 0; i < Solution.Length; i++)
+        {
+            solutionIndexes.Add(i);
+        }
+        int randomIndex1 = solutionIndexes[random.Next(0, solutionIndexes.Count)];
+        solutionIndexes.Remove(randomIndex1);
+        int randomIndex2 = solutionIndexes[random.Next(0, solutionIndexes.Count)];
+        return [randomIndex1, randomIndex2];
+    }
+
+    public string GetHintRelativeIndexes(int[] solutionIndexes)
+    {
+        int digit1 = Solution[solutionIndexes[0]];
+        int digit2 = Solution[solutionIndexes[1]];
+        string? positionIndex1 = Enum.GetName(typeof(Position), solutionIndexes[0]);
+        string? positionIndex2 = Enum.GetName(typeof(Position), solutionIndexes[1]);
+        return digit1 > digit2 ? $"{positionIndex1} digit > {positionIndex2} digit." :
+        digit1 < digit2 ? $"{positionIndex1} digit < {positionIndex2} digit." :
+        $"{positionIndex1} digit = {positionIndex2} digit.";
+    }
+    public string GetHintGivenDigitCount(int randomDigitInGame)
+    {
+        int digitCount = 0;
+        foreach (int digit in Solution)
+        {
+            if (digit == randomDigitInGame)
+                digitCount++;
+        }
+        return digitCount == 0 ? $"There are no '{randomDigitInGame}'." :
+            digitCount == 1 ? $"There is 1 x '{randomDigitInGame}'." :
+            $"There are {digitCount} x '{randomDigitInGame}'.";
+    }
+
+    public string GetFreePerfectMatch(int randomIndex)
+    {
+        string? position = Enum.GetName(typeof(Position), randomIndex);
+        return $"{position} digit is '{Solution[randomIndex]}'.";
     }
 
     public void ChooseMenuOption()
@@ -180,7 +276,12 @@ public class Game
         {
             Console.Write($"Enter {NumberOfDigits} digits between 0-{HighestDigit} : ");
             string sequence = Console.ReadLine();
-            if (int.TryParse(sequence, out int choice))
+            if ("hint".Equals(sequence) && Hints.Count < 6)
+            {
+                GenerateHint();
+                Console.WriteLine($"--> {Hints[Hints.Count - 1]}");
+            }
+            else if (int.TryParse(sequence, out int choice))
             {
                 bool isValid = true;
                 if (sequence.Length != NumberOfDigits)
@@ -202,6 +303,11 @@ public class Game
                     {
                         Attempts[i].PrintAttempt();
                     }
+                    for (int i = 0; i < Hints.Count; i++)
+                    {
+                        Console.WriteLine(Hints[i]);
+                    }
+                    Console.WriteLine();
                     if (attempt.PerfectMatches == NumberOfDigits)
                     {
                         Console.WriteLine("CONGRATULATIONS!\n");
@@ -210,7 +316,7 @@ public class Game
                         Console.Clear();
                         break;
                     }
-                    
+
                 }
                 else
                     Console.WriteLine("Invalid");

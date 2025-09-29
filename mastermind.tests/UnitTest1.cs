@@ -67,4 +67,47 @@ public class UnitTest1
         Assert.True(s3);
         Assert.True(s4);
     }
+
+    [Fact]
+    public void GetHintGivenDigitCountTest()
+    {
+        int maxDigit = 8;
+        int numberOfDigits = 8;
+        Game game1 = new Game(maxDigit, numberOfDigits);
+        game1.Solution = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+        Game game2 = new Game(maxDigit, numberOfDigits);
+        game2.Solution = new int[] { 1, 1, 1, 1, 1, 1, 1, 1 };
+        Game game3 = new Game(maxDigit, numberOfDigits);
+        game3.Solution = new int[] { 8, 8, 8, 8, 8, 8, 8, 8 };
+
+        Assert.Equal("There is 1 x '1'.", game1.GetHintGivenDigitCount(1));
+        Assert.Equal("There are 8 x '1'.", game2.GetHintGivenDigitCount(1));
+        Assert.Equal("There are no '1'.", game3.GetHintGivenDigitCount(1));
+    }
+
+    [Fact]
+    public void GetFreePerfectMatchTest()
+    {
+        int maxDigit = 8;
+        int numberOfDigits = 8;
+        Game game1 = new Game(maxDigit, numberOfDigits);
+        game1.Solution = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+        Assert.Equal("Fourth digit is '4'.", game1.GetFreePerfectMatch(3));
+        Assert.Equal("First digit is '1'.", game1.GetFreePerfectMatch(0));
+        Assert.Equal("Eighth digit is '8'.", game1.GetFreePerfectMatch(7));
+    }
+
+    [Fact]
+    public void GetHintRelativeIndexesTest()
+    {
+        int maxDigit = 8;
+        int numberOfDigits = 8;
+        Game game1 = new Game(maxDigit, numberOfDigits);
+        game1.Solution = new int[] { 1, 2, 3, 4, 1, 2, 3, 4 };
+
+        Assert.Equal("First digit < Fourth digit.", game1.GetHintRelativeIndexes([0, 3]));
+        Assert.Equal("Eighth digit > Third digit.", game1.GetHintRelativeIndexes([7, 2]));
+        Assert.Equal("Fourth digit = Eighth digit.", game1.GetHintRelativeIndexes([3, 7]));
+    }
 }
