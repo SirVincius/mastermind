@@ -276,10 +276,11 @@ public class Game
         {
             Console.Write($"Enter {NumberOfDigits} digits between 0-{HighestDigit} : ");
             string sequence = Console.ReadLine();
-            if ("hint".Equals(sequence) && Hints.Count < 6)
+            sequence = sequence.ToLower();
+            if ("hint".Equals(sequence) && Hints.Count < NumberOfDigits)
             {
                 GenerateHint();
-                Console.WriteLine($"--> {Hints[Hints.Count - 1]}");
+                Console.WriteLine($"--> {Hints[Hints.Count - 1]}\n");
             }
             else if (int.TryParse(sequence, out int choice))
             {
@@ -310,7 +311,7 @@ public class Game
                     Console.WriteLine();
                     if (attempt.PerfectMatches == NumberOfDigits)
                     {
-                        Console.WriteLine("CONGRATULATIONS!\n");
+                        Console.WriteLine(Message.Congratulaions);
                         Console.WriteLine("Press enter to continue...");
                         Console.ReadLine();
                         Console.Clear();
