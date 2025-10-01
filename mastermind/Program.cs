@@ -1,7 +1,6 @@
-﻿using System.ComponentModel;
-using System.Dynamic;
-using System.Globalization;
-using System.Reflection.Metadata;
+﻿#pragma warning disable IDE0028
+
+using System.Text.Json;
 public enum Position
 {
     First = 0,
@@ -16,7 +15,7 @@ public enum Position
 
 public class Attempt
 {
-    public int[] Digits;
+    public int[] Digits = [];
     public int DigitMatches;
     public int PerfectMatches;
 
@@ -28,6 +27,7 @@ public class Attempt
             Digits[i] = (int)char.GetNumericValue(sequence[i]);
         }
     }
+    public Attempt() { }
 
     public void PrintAttempt()
     {
@@ -53,7 +53,7 @@ public class Game
     public int[] Solution { get; set; } = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public List<Attempt> Attempts { get; set; } = new List<Attempt>();
     public List<string> Hints { get; set; } = new List<string>();
-    public Game(){} // For testing purpose only
+    public Game() { } // For testing purpose only
     public Game(int highestDigit, int numberOfDigits)
     {
         HighestDigit = highestDigit;
@@ -72,7 +72,7 @@ public class Game
 
     public void GenerateHint()
     {
-            string hint;
+        string hint;
         while (true)
         {
             int randomHintType = random.Next(1, 4);
@@ -89,7 +89,7 @@ public class Game
                 hint = GetHintRelativeIndexes(Get2DifferentSolutionIndexes());
             }
             if (!Hints.Contains(hint))
-            break;
+                break;
         }
         Hints.Add(hint);
     }
@@ -164,12 +164,14 @@ public class Game
                         HighestDigit = ChooseHighestDigits();
                         NumberOfDigits = ChooseNumberOfDigits();
                         Solution = GenerateSolution();
+                        Attempts = new List<Attempt>();
+                        Hints = new List<string>();
                         StartGame();
                         break;
                     }
                     else if (number == 2)
                     {
-                        Console.WriteLine("Implementation to come");
+                        PrintRecords();
                     }
                     else if (number == 3)
                     {
@@ -216,7 +218,7 @@ public class Game
         }
     }
 
-     public int ChooseNumberOfDigits()
+    public int ChooseNumberOfDigits()
     {
         while (true)
         {
@@ -235,7 +237,7 @@ public class Game
                 }
             }
             else
-            { 
+            {
                 Console.WriteLine("Invalid choice.");
                 Console.WriteLine();
             }
@@ -311,10 +313,11 @@ public class Game
                     Console.WriteLine();
                     if (attempt.PerfectMatches == NumberOfDigits)
                     {
-                        Console.WriteLine(Message.Congratulaions);
+                        Console.WriteLine(Message.Congratulations);
+                        List<Game> gameRecords = DeserializeGameRecords();
+                        LogGame(gameRecords);
                         Console.WriteLine("Press enter to continue...");
                         Console.ReadLine();
-                        Console.Clear();
                         break;
                     }
 
@@ -328,6 +331,70 @@ public class Game
             }
         }
     }
+
+    public string SerializeGameToJson(List<Game> gamesRecord)
+    {
+        gamesRecord.Add(this);
+        var options = new JsonSerializerOptions
+        {
+            IncludeFields = true
+        };
+        string gameJson = JsonSerializer.Serialize(gamesRecord, options);
+        return gameJson;
+    }
+    public List<Game> DeserializeGameRecords()
+    {
+        List<Game> games;
+        var options = new JsonSerializerOptions { IncludeFields = true };
+        if (File.Exists("./records.json"))
+        {
+            string gameRecords = File.ReadAllText("./records.json");
+            games = JsonSerializer.Deserialize<List<Game>>(gameRecords, options) ??
+                new List<Game>();
+        } else {
+            games = new List<Game>();
+        }
+        return games;
+    }
+    public void PrintRecords()
+    {
+        List<Game> games = DeserializeGameRecords();
+        SortedDictionary<int, int> records = new();
+        for (int i = 0; i < games.Count; i++)
+        {
+            int gameType = games[i].NumberOfDigits * 10 + games[i].HighestDigit;
+            if (records.TryGetValue(gameType, out int value))
+            {
+                if (value > games[i].Attempts.Count)
+                    records[gameType] = games[i].Attempts.Count;
+            }
+            else
+            {
+                records.Add(gameType, games[i].Attempts.Count);
+            }
+        }
+        Console.WriteLine("\nRecords");
+        Console.WriteLine("-------\n");
+        Console.WriteLine("Number of digits - Highest digit : Minimum attempts");
+        foreach (var key in records.Keys)
+        {
+            Console.WriteLine($"{key / 10}-{key % 10} : {records[key]}");
+        }
+    }
+    public void LogGame(List<Game> gamesRecord)
+    {
+        try
+        {
+            string gameJson = SerializeGameToJson(gamesRecord);
+            StreamWriter sw = new("./records.json");
+            sw.WriteLine(gameJson);
+            sw.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: " + e.Message);
+        }
+    }
 }
 
 class Program
@@ -339,20 +406,3 @@ class Program
         game.ChooseMenuOption();
     }
 }
-/*
-
-########################################################################    
-##                                                                    ##
-##   #    #   ##   ##### ##### ##### ####  #    # ##### #   # ####    ##
-##   ##  ## ##  ## ##      #   ##    ## ## ##  ##   #   ##  # ## ##   ##
-##   ###### ###### #####   #   ##### ##### ######   #   # # # ## ##   ##
-##   ##  ## ##  ##     #   #   ##    ## #  ##  ##   #   #  ## ## ##   ##
-##   ##  ## ##  ## #####   #   ##### ## ## ##  ## ##### #   # ####    ##
-##                                                                    ##
-########################################################################
-
-1. New Game
-2. See Records
-3. Quit
-
-*/
