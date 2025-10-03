@@ -60,6 +60,16 @@ public class Game
         NumberOfDigits = numberOfDigits;
     }
 
+    public void CreateNewGame()
+    {
+        
+        HighestDigit = ChooseHighestDigits();
+        NumberOfDigits = ChooseNumberOfDigits();
+        Solution = GenerateSolution();
+        Attempts = new List<Attempt>();
+        Hints = new List<string>();
+    }
+
     public int[] GenerateSolution()
     {
         int[] solution = new int[NumberOfDigits];
@@ -161,11 +171,7 @@ public class Game
                 {
                     if (number == 1)
                     {
-                        HighestDigit = ChooseHighestDigits();
-                        NumberOfDigits = ChooseNumberOfDigits();
-                        Solution = GenerateSolution();
-                        Attempts = new List<Attempt>();
-                        Hints = new List<string>();
+                        CreateNewGame();
                         StartGame();
                         break;
                     }
