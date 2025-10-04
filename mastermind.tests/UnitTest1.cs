@@ -9,7 +9,7 @@ public class UnitTest1
     {
         Game game1 = new Game(8, 8);
         game1.Solution = new int[] { 1, 2, 3, 4, 1, 2, 3, 4 };
-        Attempt attempt1 = new Attempt("12341234", 8);
+        Attempt attempt1 = new Attempt("12341234", 4);
         Attempt attempt2 = new Attempt("12345678", 8);
         Attempt attempt3 = new Attempt("12344321", 8);
 
