@@ -23,5 +23,8 @@ jobs:
       - name: Build
         run: dotnet build
 
+      - name: Build test
+        run: dotnet build mastermind.tests/mastermind.tests.csproj
+
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test mastermind.tests/mastermind.tests.csproj --no-build
